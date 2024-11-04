@@ -1,2 +1,11 @@
 # deps
 node_modules/
+
+# env
+.env
+.env.production
+
+dev.db
+test.db
+.vercel
+dist

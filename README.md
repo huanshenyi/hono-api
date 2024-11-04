@@ -1,8 +1,23 @@
 # hono-api
 
-hono 検証用
+Hono API 検証用
 
 To install dependencies:
+
+Create .env file
+
+```sh
+cp .env.example .env
+```
+
+Create sqlite db / push schema
+
+```sh
+bun drizzle-kit generate
+bun drizzle-kit push
+```
+
+Install dependencies
 
 ```sh
 bun install
@@ -15,15 +30,16 @@ bun run dev
 ```
 
 open http://localhost:3000
- 
+
 To run continer:
 
-```
+```sh
 docker build -t hono-api .
 ```
 
 To run:
-```
+
+```sh
 docker run -p 3000:3000 hono-api
 ```
 
@@ -45,3 +61,9 @@ Stoker
 ### ドキュメント:
 
 Scalar Documentation
+
+### ORM
+
+drizzle
+
+- ドキュメント: https://orm.drizzle.team/
