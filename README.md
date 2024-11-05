@@ -58,6 +58,8 @@ Stoker
 
 説明: Hono フレームワークでの HTTP リクエスト機能を拡張するライブラリ。
 
+URL: https://github.com/scalar/scalar/tree/main/packages/hono-api-reference
+
 ### ドキュメント:
 
 Scalar Documentation

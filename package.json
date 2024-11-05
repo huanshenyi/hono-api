@@ -12,6 +12,7 @@
     "studio": "bun drizzle-kit studio"
   },
   "dependencies": {
+    "@asteasolutions/zod-to-openapi": "^7.2.0",
     "@hono/zod-openapi": "^0.16.4",
     "@libsql/client": "^0.14.0",
     "@scalar/hono-api-reference": "^0.5.158",
