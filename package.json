@@ -9,7 +9,8 @@
     "format": "bunx biome format --write ./src",
     "generate": "bun drizzle-kit generate",
     "push": "bun drizzle-kit push",
-    "studio": "bun drizzle-kit studio"
+    "studio": "bun drizzle-kit studio",
+    "test": "bun test"
   },
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "^7.2.0",
