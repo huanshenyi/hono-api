@@ -43,7 +43,7 @@ ecs
 docker buildx build \
   --no-cache \
   --platform=linux/x86_64 \
-  -t chat-commerce-app-api \
+  -t my-app-api \
   .
 ```
 
