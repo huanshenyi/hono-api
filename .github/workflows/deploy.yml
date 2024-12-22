@@ -1,0 +1,101 @@
+name: Deploy Hono API Action
+on:
+  push:
+    paths:
+      - "src/**"
+
+env:
+  AWS_REGION: ap-northeast-1
+  PROJECT_NAME: hono-api
+  ECS_CLUSTER: my-app-cluster
+  ECS_SERVICE: my-app-api-service
+  ECR_REPOSITORY: my-app-api
+  ECR_TASK_DEFINITION_API: .aws/task-def-api.json
+  CACHE_PATH: /tmp/.buildx-hono-api
+
+permissions:
+  id-token: write
+  contents: read
+  actions: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Run tests
+        run: echo "Running tests..."
+
+  create-container:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Create tag
+        run: |
+          COMMIT_HASH=$(git rev-parse --short "$GITHUB_SHA")
+          TAG=${{ vars.AWS_ACCOUNT_ID }}.dkr.ecr.ap-northeast-1.amazonaws.com/my-app-api:$COMMIT_HASH
+          echo "TAGS=$TAG" >> $GITHUB_ENV
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-regin: ${{ env.AWS_REGION }}
+          role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/${{ env.PROJECT_NAME }}-assume-role
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          tags: ${{ env.TAGS }}
+          push: true
+          platforms: linux/x86_64
+          file: Dockerfile
+          provenance: false
+          cache-from: type=local,src=${{ env.CACHE_PATH }}
+          cache-to: type=local,dest=${{ env.CACHE_PATH }}-new,mode=max
+      - name: Move cache
+        run: |
+          rm -rf ${{ env.CACHE_PATH }}
+          mv ${{ env.CACHE_PATH }}-new ${{ env.CACHE_PATH }}
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [create-container]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/${{ env.PROJECT_NAME }}-assume-role
+
+      # - name: Upload the image url fle as an artifact
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: api-image-url
+      #     path: .image-url
+
+      - name: Fill in the new image URI in the amazon ECS task definition
+        id: render-task-def
+        uses: aws-actions/amazon-ecs-write-task-definition@v2
+        with:
+          task-definition: ${{ env.ECR_TASK_DEFINITION_API }}
+          container-name: api
+          image: ${{ env.TAGS }}
+
+      - name: Deploy ECS task
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v3
+        with:
+          task-definition: ${{ steps.render-task-def.outputs.task-definition }}
+          service: ${{ env.ECS_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true

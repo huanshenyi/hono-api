@@ -37,6 +37,16 @@ To run continer:
 docker build -t hono-api .
 ```
 
+ecs
+
+```sh
+docker buildx build \
+  --no-cache \
+  --platform=linux/x86_64 \
+  -t chat-commerce-app-api \
+  .
+```
+
 To run:
 
 ```sh
