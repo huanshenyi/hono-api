@@ -9,3 +9,4 @@ dev.db
 test.db
 .vercel
 dist
+src/db/migrations
