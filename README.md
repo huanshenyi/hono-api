@@ -10,11 +10,17 @@ Create .env file
 cp .env.example .env
 ```
 
-Create sqlite db / push schema
+Create db
 
 ```sh
-bun drizzle-kit generate
-bun drizzle-kit push
+make up
+```
+
+Run database migrations
+
+```sh
+bunx drizzle-kit generate
+bunx drizzle-kit push
 ```
 
 Install dependencies
