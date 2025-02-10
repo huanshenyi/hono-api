@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "^7.2.0",
+    "@hono/oidc-auth": "^1.4.1",
     "@hono/zod-openapi": "^0.16.4",
     "@libsql/client": "^0.14.0",
     "@scalar/hono-api-reference": "^0.5.158",
